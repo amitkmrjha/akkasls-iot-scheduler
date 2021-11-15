@@ -1,0 +1,68 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+
+package com.lightbend.iot.city.api;
+
+message AddLocationInfo{
+    string city_id = 1 [(akkaserverless.field).entity_key = true];
+    int32 longitude = 2 ;
+    int32 latitude = 3 ;
+    string placeId = 4 ;
+}
+
+message AddWeatherActivity{
+    string city_id = 1 [(akkaserverless.field).entity_key = true];
+    string weather = 2;
+}
+
+message AddHashTagActivity {
+    string city_id = 1 [(akkaserverless.field).entity_key = true];
+    string hashTag = 2;
+}
+
+message GetCity {
+    string city_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+
+message CurrentCity {
+    string city_id = 1 ;
+    int32 longitude = 2 ;
+    int32 latitude = 3 ;
+    string placeId = 4 ;
+    string weather = 5;
+    string hashTag = 6;
+}
+service CityService {
+    option (akkaserverless.service) = {
+        type : SERVICE_TYPE_ENTITY
+        component : "com.lightbend.iot.city.domain.City"
+    };
+    rpc AddLocation(AddLocationInfo) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/city/{city_id}/addlocation"
+            body: "*"
+        };
+    };
+    rpc AddWeather(AddWeatherActivity) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/city/{city_id}/addweather"
+            body: "*"
+        };
+    };
+    rpc AddHashTag(AddHashTagActivity) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/city/{city_id}/addhashtag"
+            body: "*"
+        };
+    };
+    rpc Get(GetCity) returns (CurrentCity){
+        option (google.api.http) = {
+            get: "/city/{city_id}"
+        };
+    };
+}

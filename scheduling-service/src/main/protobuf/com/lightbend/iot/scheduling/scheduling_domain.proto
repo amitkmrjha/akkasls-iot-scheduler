@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package com.lightbend.iot.scheduling;
+
+import "akkaserverless/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option (akkaserverless.file).event_sourced_entity = {
+  name: "Scheduler"
+  entity_type: "scheduler"
+  state: "SchedulerState"
+  events: ["SchedulerTicked"]
+};
+
+message SchedulerTicked {
+  string id = 1;
+  google.protobuf.Timestamp at = 2;
+}
+
+message SchedulerState {
+    google.protobuf.Timestamp tick_at = 1;
+}
+
+message ScheduleNext {
+  string scheduler_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+service SchedulingService {
+  option (akkaserverless.service) = {
+    type : SERVICE_TYPE_ENTITY
+    component : "com.lightbend.iot.scheduling.Scheduler"
+  };
+
+  rpc Schedule (ScheduleNext) returns (google.protobuf.Empty);
+
+}
+
+
+service SchedulingTicksTopic {
+  option (akkaserverless.service) = {
+    type : SERVICE_TYPE_ACTION
+  };
+
+  rpc Publish (SchedulerTicked) returns (SchedulerTicked) {
+    option (akkaserverless.method).eventing.in = {
+      event_sourced_entity: "scheduler"
+    };
+    option (akkaserverless.method).eventing.out = {
+      topic:  "scheduler-events"
+    };
+  }
+
+  rpc Subscribe (SchedulerTicked) returns (google.protobuf.Empty) {
+    option (akkaserverless.method).eventing.in = {
+      topic:  "scheduler-events"
+    };
+  }
+
+}

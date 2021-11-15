@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package com.lightbend.iot.transport.domain;
+
+import "akkaserverless/annotations.proto";
+
+option (akkaserverless.file).value_entity = {
+    name: "Trip"
+    entity_type: "trip"
+    state: "TripState"
+};
+
+message TripState {
+    string trip_id = 1 ;
+    int32 longitude = 2 ;
+    int32 latitude = 3 ;
+    string place_id = 4 ;
+    string destination_city_id = 5;
+    string origin_city_id = 6;
+    string transport_name = 7;
+    string transport_type = 8;
+    bool isActive = 9;
+}

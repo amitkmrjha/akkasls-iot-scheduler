@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package com.lightbend.iot.transport.subscribe;
+
+import "akkaserverless/annotations.proto";
+import "com/lightbend/iot/transport/api/transport_api.proto";
+import "google/protobuf/empty.proto";
+
+
+message AddTripEvent {
+    string trip_id = 1;
+    int32 longitude = 2 ;
+    int32 latitude = 3 ;
+    string place_id = 4 ;
+    string destination_city_id = 5;
+    string origin_city_id = 6;
+    string transport_name = 7;
+    string transport_type = 8;
+}
+message CompleteTripEvent{
+    string trip_id = 1;
+}
+
+service TripTopicSubscription {
+    option (akkaserverless.service) = {
+        type : SERVICE_TYPE_ACTION
+    };
+    rpc AddTripViaTopic(AddTripEvent) returns (google.protobuf.Empty){
+        option (akkaserverless.method).eventing.in = {
+            topic:  "trip-events"
+        };
+    };
+    rpc CompleteTripViaTopic(CompleteTripEvent) returns (google.protobuf.Empty){
+        option (akkaserverless.method).eventing.in = {
+            topic:  "trip-events"
+        };
+    };
+}

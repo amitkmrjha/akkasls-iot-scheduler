@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package com.lightbend.iot.transport.view;
+
+import "akkaserverless/annotations.proto";
+import "google/protobuf/any.proto";
+import "com/lightbend/iot/transport/domain/transport_domain.proto";
+
+service TripByOrigin {
+    option (akkaserverless.service) = {
+        type: SERVICE_TYPE_VIEW
+    };
+
+    rpc UpdateTrip(domain.TripState) returns (domain.TripState) {
+        option (akkaserverless.method).eventing.in = {
+            value_entity: "trip"
+        };
+        option (akkaserverless.method).view.update = {
+            table: "trips"
+        };
+    }
+
+    rpc GetTrips(ByOriginRequest) returns (stream domain.TripState) {
+        option (akkaserverless.method).view.query = {
+            query: "SELECT * FROM trips WHERE destination_city_id = :destination_city_id and origin_city_id = :origin_city_id"
+        };
+    }
+}
+
+message ByOriginRequest {
+    string destination_city_id = 1;
+    string origin_city_id = 2;
+}

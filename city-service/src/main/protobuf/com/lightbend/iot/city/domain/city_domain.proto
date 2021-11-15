@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.lightbend.iot.city.domain;
+
+import "akkaserverless/annotations.proto";
+
+option (akkaserverless.file).value_entity = {
+    name: "City"
+    entity_type: "city"
+    state: "CityState"
+};
+
+message CityState {
+    string city_id = 1 ;
+    int32 longitude = 2 ;
+    int32 latitude = 3 ;
+    string placeId = 4 ;
+    string weather = 5;
+    string hashTag = 6;
+}
